@@ -1,6 +1,7 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { Transition } from 'react-transition-group';
-import { connect } from 'react-redux'
+import {actionCreators } from './store';
 import { IconFontStyle } from '../../statics/iconfont/iconfont';
 
 
@@ -14,6 +15,7 @@ import {
     Addition,
     Button
 } from './style';
+import { bindActionCreators } from 'redux';
 
 const Header = (props) => {
         return(
@@ -64,16 +66,10 @@ const mapStateToProps = (state) => {
 const mapDispathToProps = (dispath) => {
     return {
         handleInputFocus(){
-            const action = {
-                type: 'search_focus'
-            };
-            dispath(action);
+            dispath(actionCreators.searchFocus());
         },
         handleInputBlur(){
-            const action = {
-                type: 'search_blur'
-            };
-            dispath(action);
+            dispath(actionCreators.searchBlur());
         }
         
     }
