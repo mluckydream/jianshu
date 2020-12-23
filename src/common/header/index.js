@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component }from 'react';
 import { connect } from 'react-redux';
 import { Transition } from 'react-transition-group';
 import {actionCreators } from './store';
@@ -21,36 +21,32 @@ import {
     Button
 } from './style';
 
-
-
-const getListArea = (show) => {
-    if(show){
-        return (
-            <SearchInfo>
-                            <SearchInfoTitle>
-                                热门搜索
-                                <SearchInfoSwitch>
-                                    换一批
-                                </SearchInfoSwitch>
-                                <SearchInfoList>
-                                    <SearchInfoItem>教育</SearchInfoItem>
-                                    <SearchInfoItem>教育</SearchInfoItem>
-                                    <SearchInfoItem>教育</SearchInfoItem>
-                                    <SearchInfoItem>教育</SearchInfoItem>
-                                    <SearchInfoItem>教育</SearchInfoItem>
-                                    <SearchInfoItem>教育</SearchInfoItem>
-                                    <SearchInfoItem>教育</SearchInfoItem>
-                                    <SearchInfoItem>教育</SearchInfoItem>
-                                </SearchInfoList>
-                            </SearchInfoTitle>
-                        </SearchInfo>
-        )
-    }else {
-        return null;
+class Header extends Component {
+    getListArea (){
+        if(this.props.focused){
+            return (
+                <SearchInfo>
+                     <SearchInfoTitle>
+                     热门搜索
+                         <SearchInfoSwitch>
+                            换一批
+                         </SearchInfoSwitch>
+                         <SearchInfoList>
+                             {
+                                 this.props.list.map((item) => {
+                                     return <SearchInfoItem key={item}>{item}</SearchInfoItem>
+                                 })
+                             }
+                        </SearchInfoList>                     
+                     </SearchInfoTitle>               
+                </SearchInfo>
+            )
+        }else {
+            return null;
+        }
     }
 
-}
-const Header = (props) => {
+    render(){
         return(
             <HeaderWrapper>
                 <IconFontStyle />
@@ -64,21 +60,19 @@ const Header = (props) => {
                     </NavItem>
                     <SearchWrapper>
                         <Transition
-                           in={props.focused}
+                           in={this.props.focused}
                            timeout={200}
                            classNames="slide"
                         >
                             <NavSearch 
-                            className={props.focused ? 'focused' : ''}
-                            onFocus={props.handleInputFocus}
-                            onBlur={props.handleInputBlur}
+                            className={this.props.focused ? 'focused' : ''}
+                            onFocus={this.props.handleInputFocus}
+                            onBlur={this.props.handleInputBlur}
                             ></NavSearch>
                         </Transition>
-                        <span className={props.focused ? 'focused iconfont' : 'iconfont'}>&#xe612;</span>
-                        {getListArea(props.focused)}
-                    </SearchWrapper>
-                
-                   
+                        <span className={this.props.focused ? 'focused iconfont' : 'iconfont'}>&#xe612;</span>
+                        {this.getListArea()}
+                    </SearchWrapper>              
                 </Nav>
                 <Addition>
 
@@ -91,16 +85,27 @@ const Header = (props) => {
 
             </HeaderWrapper>
         )
-}
+
+    }
+} 
+
+
 const mapStateToProps = (state) => {
     return {
-        focused: state.header.get('focused')
+        // 老版本
+        // focused: state.getIn(['header', 'focused']),
+        // list: state.getIn(['header', 'list'])
+        
+        // 新版本
+        focused: state.header.getIn(['focused']),
+        list: state.header.getIn(['list'])
     }
 }
 
 const mapDispathToProps = (dispath) => {
     return {
         handleInputFocus(){
+            dispath(actionCreators.getList());
             dispath(actionCreators.searchFocus());
         },
         handleInputBlur(){
