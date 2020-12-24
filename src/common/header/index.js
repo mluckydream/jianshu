@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { Transition } from 'react-transition-group';
 import {actionCreators } from './store';
 import { IconFontStyle } from '../../statics/iconfont/iconfont';
-import { bindActionCreators } from 'redux';
 
 import {
     HeaderWrapper,
@@ -23,23 +22,33 @@ import {
 
 class Header extends Component {
     getListArea (){
-        const { focused, list } = this.props;
-        if(focused){
+        const { focused, list, page, totalPage, mouseIn, handleMouseEnter, handleMouseLeave, handleChangePage } = this.props;
+        const newList = list.toJS();
+        const pageList = [];
+
+        if(newList.length){
+            for(let i = (page - 1) * 10; i < page * 10; i++){
+                pageList.push(
+                    <SearchInfoItem key={newList[i]}>{newList[i]}</SearchInfoItem> 
+                );
+            }
+        }
+      
+        if(focused || mouseIn){
             return (
-                <SearchInfo>
-                     <SearchInfoTitle>
+                <SearchInfo 
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+                >
+                     <SearchInfoTitle onClick={() => handleChangePage(page, totalPage)}>
                      热门搜索
                          <SearchInfoSwitch>
                             换一批
                          </SearchInfoSwitch>
+                     </SearchInfoTitle>    
                          <SearchInfoList>
-                             {
-                                 list.map((item) => {
-                                     return <SearchInfoItem key={item}>{item}</SearchInfoItem>
-                                 })
-                             }
-                        </SearchInfoList>                     
-                     </SearchInfoTitle>               
+                             {pageList}
+                        </SearchInfoList>                                             
                 </SearchInfo>
             )
         }else {
@@ -100,7 +109,10 @@ const mapStateToProps = (state) => {
         
         // 新版本
         focused: state.header.getIn(['focused']),
-        list: state.header.getIn(['list'])
+        list: state.header.getIn(['list']),
+        page: state.header.getIn(['page']),
+        totalPage: state.header.getIn(['totalPage']),
+        mouseIn: state.header.getIn(['mouseIn'])
     }
 }
 
@@ -112,6 +124,19 @@ const mapDispathToProps = (dispath) => {
         },
         handleInputBlur(){
             dispath(actionCreators.searchBlur());
+        },
+        handleMouseEnter(){
+            dispath(actionCreators.mouseEnter());
+        },
+        handleMouseLeave(){
+            dispath(actionCreators.mouseLeave());
+        },
+        handleChangePage(page, totalPage){
+            if(page < totalPage){
+                dispath(actionCreators.changePage(page + 1));
+            }else {
+                dispath(actionCreators.changePage(1));
+            }
         }
         
     }
