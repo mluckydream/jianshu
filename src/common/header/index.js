@@ -1,7 +1,7 @@
 import React, { Component }from 'react';
 import { connect } from 'react-redux';
 import { Transition } from 'react-transition-group';
-import {actionCreators } from './store';
+import { actionCreators } from './store';
 import { IconFontStyle } from '../../statics/iconfont/iconfont';
 
 import {
@@ -40,9 +40,11 @@ class Header extends Component {
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
                 >
-                     <SearchInfoTitle onClick={() => handleChangePage(page, totalPage)}>
+                     <SearchInfoTitle>
                      热门搜索
-                         <SearchInfoSwitch>
+                     <IconFontStyle />
+                         <SearchInfoSwitch onClick={() => handleChangePage(page, totalPage, this.spinIcon)}>
+                         <span ref={(icon) => {this.spinIcon = icon}} class="iconfont spin">&#59475;</span>
                             换一批
                          </SearchInfoSwitch>
                      </SearchInfoTitle>    
@@ -81,7 +83,7 @@ class Header extends Component {
                             onBlur={handleInputBlur}
                             ></NavSearch>
                         </Transition>
-                        <span className={focused ? 'focused iconfont' : 'iconfont'}>&#xe612;</span>
+                        <span className={focused ? 'focused iconfont zoom'  : 'iconfont zoom'}>&#xe612;</span>
                         {this.getListArea()}
                     </SearchWrapper>              
                 </Nav>
@@ -131,7 +133,14 @@ const mapDispathToProps = (dispath) => {
         handleMouseLeave(){
             dispath(actionCreators.mouseLeave());
         },
-        handleChangePage(page, totalPage){
+        handleChangePage(page, totalPage, spin){
+            let originAngle = spin.style.transform.replace(/[^0-9]/ig, '');
+            if(originAngle){
+                originAngle = parseInt(originAngle, 10);
+            }else{
+                originAngle = 0;
+            }
+            spin.style.transform = 'rotate(' + (originAngle + 360) + 'deg)';
             if(page < totalPage){
                 dispath(actionCreators.changePage(page + 1));
             }else {
